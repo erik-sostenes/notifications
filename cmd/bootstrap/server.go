@@ -37,7 +37,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	svr.Server.Shutdown(ctx)
+	_ = svr.Server.Shutdown(ctx)
 
 	log.Println("server has been canceled")
 }
