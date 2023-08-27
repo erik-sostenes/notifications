@@ -32,7 +32,7 @@ type (
 	// Maps the DTO values to value objects in our domain and invokes the use case
 	Handler[V Command] interface {
 		// Handler represents the action that you want to perform by means of the Command, which will send it to the service layer
-		Handler(ctx context.Context, v V) error
+		Handler(ctx context.Context, v *V) error
 	}
 )
 
@@ -64,5 +64,5 @@ func (cb *CommandBus[V]) Dispatch(ctx context.Context, v V) (err error) {
 		return
 	}
 
-	return ch.Handler(ctx, v)
+	return ch.Handler(ctx, &v)
 }
