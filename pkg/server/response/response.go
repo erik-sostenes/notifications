@@ -24,32 +24,39 @@ func JSON(w http.ResponseWriter, method int, body any) error {
 
 // Bind parses the request data to an object
 // checks the content type
-func Bind(w http.ResponseWriter, r *http.Request, body any) (err error) {
+func Bind(w http.ResponseWriter, r *http.Request, body any) (ok bool, err error) {
 	content := r.Header.Get("Content-type")
+
 	if content == "" {
-		return JSON(w, http.StatusUnprocessableEntity, Response{
+		_ = JSON(w, http.StatusUnprocessableEntity, Response{
 			Message: "missing content type",
 		})
+		return
 	}
 
 	mediaType, _, err := mime.ParseMediaType(content)
 	if err != nil {
-		return JSON(w, http.StatusUnprocessableEntity, Response{
+		_ = JSON(w, http.StatusUnprocessableEntity, Response{
 			Message: err.Error(),
 		})
+		return
 	}
 
 	switch mediaType {
-	case "application/json; charset=utf-8":
+	case "application/json; charset=utf-8", "application/json":
 		err = json.NewDecoder(r.Body).Decode(body)
 		if err != nil {
-			return JSON(w, http.StatusUnprocessableEntity, Response{
+			_ = JSON(w, http.StatusUnprocessableEntity, Response{
 				Message: "the format of the body of the request is malformed",
 			})
 		}
+		return true, nil
+	default:
+		_ = JSON(w, http.StatusUnsupportedMediaType, Response{
+			Message: "unsupported media type",
+		})
+		return
 	}
-
-	return
 }
 
 // ErrorHandler handles http error response depending on error type

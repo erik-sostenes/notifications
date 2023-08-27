@@ -120,10 +120,6 @@ func (r *RouteGroup) Route(method METHOD, handler http.HandlerFunc, m ...Middlew
 }
 
 func (r *RouteGroup) applyMiddlewares(handler http.HandlerFunc, m ...MiddlewareFunc) http.HandlerFunc {
-	if m == nil {
-		return handler
-	}
-
 	for _, middleware := range append(r.DefaultMiddlewares, m...) {
 		handler = middleware(handler)
 	}
