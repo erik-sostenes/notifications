@@ -4,6 +4,11 @@ on:
   push:
     branches: ["main"]
 
+env:
+  # The hostname used to communicate with the Redis service container
+  REDIS_HOST: localhost
+  # The default Redis port
+  REDIS_PORT: 6379
 jobs:
   build:
     runs-on:
@@ -46,9 +51,3 @@ jobs:
 
       - name: Build
         run: go build -v ./...
-
-        env:
-          # The hostname used to communicate with the Redis service container
-          REDIS_HOST: localhost
-          # The default Redis port
-          REDIS_PORT: 6379
