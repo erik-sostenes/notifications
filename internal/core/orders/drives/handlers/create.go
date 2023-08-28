@@ -5,7 +5,7 @@ import (
 
 	"github.com/erik-sostenes/notifications-api/internal/core/orders/business/services"
 	"github.com/erik-sostenes/notifications-api/internal/core/orders/drives/handlers/dto"
-	"github.com/erik-sostenes/notifications-api/pkg/domain/bus/command"
+	"github.com/erik-sostenes/notifications-api/pkg/bus/command"
 	"github.com/erik-sostenes/notifications-api/pkg/server/response"
 )
 

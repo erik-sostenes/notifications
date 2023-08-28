@@ -1,8 +1,8 @@
 package domain
 
 import (
+	"github.com/erik-sostenes/notifications-api/pkg/bus/event"
 	"github.com/erik-sostenes/notifications-api/pkg/common"
-	"github.com/erik-sostenes/notifications-api/pkg/domain/bus/event"
 )
 
 // OrderCreatedEvent implements the event.Event interface

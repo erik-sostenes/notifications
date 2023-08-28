@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/erik-sostenes/notifications-api/internal/core/orders/business/domain"
-	"github.com/erik-sostenes/notifications-api/pkg/domain/bus/command"
-	"github.com/erik-sostenes/notifications-api/pkg/domain/bus/event"
+	"github.com/erik-sostenes/notifications-api/pkg/bus/command"
+	"github.com/erik-sostenes/notifications-api/pkg/bus/event"
 )
 
 // CreateOrderCommand implements the command.Command interface

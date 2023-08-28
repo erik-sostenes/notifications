@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/erik-sostenes/notifications-api/internal/core/orders/business/domain"
+	"github.com/erik-sostenes/notifications-api/pkg/bus/event"
 	"github.com/erik-sostenes/notifications-api/pkg/common"
-	"github.com/erik-sostenes/notifications-api/pkg/domain/bus/event"
 	"github.com/redis/go-redis/v9"
 )
 

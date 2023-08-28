@@ -3,8 +3,8 @@ package domain
 import (
 	"context"
 
+	"github.com/erik-sostenes/notifications-api/pkg/bus/event"
 	"github.com/erik-sostenes/notifications-api/pkg/common"
-	"github.com/erik-sostenes/notifications-api/pkg/domain/bus/event"
 )
 
 // Order represents a Value Object with the values of a food order
