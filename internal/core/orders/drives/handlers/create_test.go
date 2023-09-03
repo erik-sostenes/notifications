@@ -57,6 +57,38 @@ func Test_HttpHandlerOrderCreator(t *testing.T) {
 			},
 			expectedStatusCode: http.StatusCreated,
 		},
+		"Given an invalid non-existing food order, a status code 422 is expected": {
+			Request: httptest.NewRequest(http.MethodPut, "/api/v1/orders/create",
+				strings.NewReader(
+					`{
+							"createAt": "2022-11-21 19:51:39",
+							"status": "WAITING",
+							"price": {
+								"amount": "45.62",
+								"currency": "MX"
+							},
+							"requestedTime": "2022-11-21 19:51:39",
+							"isProduct": "true",
+							"isSubscription": "false",
+							"typeSubs": "YEAR",
+ 							"userId":"c2f91217-de8b-46fa-9168-132fe9285d87",
+					}`,
+				),
+			),
+			HandlerFunc: func() (http.HandlerFunc, error) {
+				publisher := event.NewMockDomainEventPublisher("eatfast.order.1.domain_event.order.create_order_event")
+				orderCommandHandler := services.NewCreateOrderCommandHandler(&publisher)
+
+				cmd := make(command.CommandBus[services.CreateOrderCommand])
+
+				if err := cmd.Record(services.CreateOrderCommand{}, orderCommandHandler); err != nil {
+					return nil, err
+				}
+
+				return HttpHandlerOrderCreator(&cmd), nil
+			},
+			expectedStatusCode: http.StatusUnprocessableEntity,
+		},
 	}
 
 	for name, ts := range tsc {
@@ -68,6 +100,7 @@ func Test_HttpHandlerOrderCreator(t *testing.T) {
 
 			h, err := ts.HandlerFunc()
 			if err != nil {
+				t.FailNow()
 			}
 
 			h.ServeHTTP(resp, req)
