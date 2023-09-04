@@ -18,8 +18,8 @@ type DomainEventPublisher struct {
 	Stream string
 }
 
-func NewDomainEventPublisher(rdb *redis.Client, stream string) DomainEventPublisher {
-	return DomainEventPublisher{
+func NewDomainEventPublisher(rdb *redis.Client, stream string) *DomainEventPublisher {
+	return &DomainEventPublisher{
 		rdb,
 		stream,
 	}

@@ -18,7 +18,7 @@ func Injector() (*route.RouteGroup, error) {
 
 	publisher := event.NewDomainEventPublisher(rdb, streamName)
 
-	orderCommandHandler := services.NewCreateOrderCommandHandler(&publisher)
+	orderCommandHandler := services.NewCreateOrderCommandHandler(publisher)
 
 	cmd := make(command.CommandBus[services.CreateOrderCommand])
 
