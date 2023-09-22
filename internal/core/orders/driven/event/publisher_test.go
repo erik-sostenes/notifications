@@ -15,10 +15,12 @@ func Test_Publisher(t *testing.T) {
 
 	tsc := map[string]struct {
 		OrderFunc
+		streamName string
 		event.Publisher[domain.OrderCreatedEvent]
+		rdb           *redis.Client
 		expectedError error
 	}{
-		"": {
+		"Given a valid domain event, it will be published correctly": {
 			OrderFunc: func() (order domain.Order, err error) {
 				price, err := domain.NewPrice(45.62, "MX")
 				if err != nil {
@@ -43,17 +45,12 @@ func Test_Publisher(t *testing.T) {
 					"c2f91217-de8b-46fa-9168-132fe9285d87",
 				)
 			},
-			Publisher: NewDomainEventPublisher(db.NewRedisDataBase(db.NewRedisDBConfiguration()), "test.order.1.domain_event.order.create_order_event"),
+			streamName: "test.order.1.domain_event.order.create_order_event",
+			rdb:        db.NewRedisDataBase(db.NewRedisDBConfiguration()),
+			Publisher:  NewDomainEventPublisher(db.NewRedisDataBase(db.NewRedisDBConfiguration()), "test.order.1.domain_event.order.create_order_event"),
 		},
 	}
 
-	rdb := db.NewRedisDataBase(db.NewRedisDBConfiguration())
-
-	t.Cleanup(func() {
-		_ = rdb.Close()
-	})
-
-	evtName := "test.order.1.domain_event.order.create_order_event"
 	for name, ts := range tsc {
 		t.Run(name, func(t *testing.T) {
 			order, err := ts.OrderFunc()
@@ -62,32 +59,22 @@ func Test_Publisher(t *testing.T) {
 			}
 
 			t.Cleanup(func() {
-				_ = rdb.XDel(context.Background(), evtName)
+				_ = ts.rdb.Del(context.Background(), ts.streamName)
 			})
 
 			evts := order.PullEvents()
-
-			err = ts.Publisher.Publish(context.Background(), evts)
-			if ts.expectedError != err {
+			if ts.expectedError != ts.Publisher.Publish(context.Background(), evts) {
 				t.Fatalf("%v error was expected, but it was obtained %v", ts.expectedError, err)
 			}
 
-			args := redis.XReadArgs{
-				Streams: []string{evtName, "0"},
-				Count:   1,
-				Block:   0,
-			}
-
-			values, err := rdb.XRead(context.Background(), &args).Result()
+			values, err := ts.rdb.XRange(context.Background(), ts.streamName, "-", "+").Result()
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			for i, v := range values {
-				evt := v.Messages[i].Values
-
+			for _, v := range values {
 				expected := evts[0].AggregateID()
-				got := evt["aggregate_id"]
+				got := v.Values["aggregate_id"]
 
 				if expected != got {
 					t.Errorf("aggregate id was expected %v, but it was obtained %d", expected, got)
